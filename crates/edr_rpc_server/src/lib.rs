@@ -263,9 +263,8 @@ async fn handle_accounts(state: Arc<AppData>) -> ResponseData<Vec<Address>> {
 
 async fn handle_block_number(app_data: Arc<AppData>) -> ResponseData<U256> {
     event!(Level::INFO, "eth_blockNumber()");
-    let node_data = app_data.node.lock_data().await;
     ResponseData::Success {
-        result: node_data.blockchain.last_block_number().await,
+        result: app_data.node.last_block_number().await,
     }
 }
 

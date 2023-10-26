@@ -241,6 +241,11 @@ impl Node {
             None => Err(NodeError::UnknownAddress { address: *address }),
         }
     }
+
+    pub async fn last_block_number(&self) -> U256 {
+        let node_data = self.lock_data().await;
+        node_data.blockchain.last_block_number().await
+    }
 }
 
 pub(super) struct NodeData {
@@ -549,6 +554,22 @@ pub(crate) mod tests {
 
         let chain_id = fixture.node.chain_id().await;
         assert_eq!(chain_id, U64::from(fixture.config.chain_id));
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn last_block_number() -> Result<()> {
+        let fixture = NodeTestFixture::new().await?;
+
+        let last_block_number = fixture.node.last_block_number().await;
+        assert_eq!(last_block_number, U256::ZERO);
+
+        fixture.node.lock_data().await.mine_block(None).await?;
+        let last_block_number = fixture.node.last_block_number().await;
+        assert_eq!(last_block_number, U256::from(1));
+
+        // TODO(@alcuadrado): Test more cases as soon as we have an API to mine more blocks
 
         Ok(())
     }

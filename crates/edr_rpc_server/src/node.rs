@@ -258,7 +258,7 @@ impl Node {
         // Temporary workaround until this gets fixed
         // https://github.com/NomicFoundation/edr/issues/186
         if block_spec == &BlockSpec::Tag(BlockTag::Pending) {
-            let prev_block = &block.header().number - U256::from(1);
+            let prev_block = block.header().number - U256::from(1);
             node_data.blockchain.revert_to_block(&prev_block).await?;
         }
 
@@ -504,8 +504,9 @@ pub(crate) mod tests {
     macro_rules! assert_error {
         ($expression:expr, $pattern:pat => $assertion:expr) => {
             match $expression {
-                $pattern => assert!($assertion),
-                _ => unreachable!("Expected error to match pattern"),
+                Err($pattern) => $assertion,
+                Err(_) => unreachable!("Expected error to match pattern"),
+                Ok(_) => unreachable!("Error expected"),
             }
         };
     }
@@ -666,40 +667,127 @@ pub(crate) mod tests {
         assert_block_number(&fixture, 1).await;
         assert_block_number(&fixture, 2).await;
 
-        let non_existing_block_error = fixture
+        let non_existing_block = fixture
             .node
             .block_by_block_spec(&BlockSpec::Number(U256::from(3)))
-            .await
-            .unwrap_err();
-
-        if let NodeError::UnknownBlockNumber { block_number } = non_existing_block_error {
-            assert_eq!(block_number, U256::from(3));
-        } else {
-            unreachable!("Invalid error")
-        }
+            .await;
 
         assert_error!(
-            non_existing_block_error,
-            NodeError::UnknownBlockNumber { block_number } => block_number == U256::from(3)
+            non_existing_block,
+            NodeError::UnknownBlockNumber { block_number } => assert_eq!(block_number, U256::from(3))
         );
 
         Ok(())
     }
 
+    #[tokio::test]
     async fn block_by_block_spec_eip1898_numbers() -> Result<()> {
-        todo!("Not implemented yet");
+        let fixture = NodeTestFixture::new().await?;
+
+        fixture.node.lock_data().await.mine_block(None).await?;
+        fixture.node.lock_data().await.mine_block(None).await?;
+
+        async fn assert_block_number(fixture: &NodeTestFixture, block_number: u64) {
+            let block = fixture
+                .node
+                .block_by_block_spec(&BlockSpec::Eip1898(Eip1898BlockSpec::Number {
+                    block_number: U256::from(block_number),
+                }))
+                .await;
+
+            assert_eq!(block.unwrap().header().number, U256::from(block_number));
+        }
+
+        assert_block_number(&fixture, 0).await;
+        assert_block_number(&fixture, 1).await;
+        assert_block_number(&fixture, 2).await;
+
+        let non_existing_block = fixture
+            .node
+            .block_by_block_spec(&BlockSpec::Number(U256::from(3)))
+            .await;
+
+        assert_error!(
+            non_existing_block,
+            NodeError::UnknownBlockNumber { block_number } => assert_eq!(block_number, U256::from(3))
+        );
 
         Ok(())
     }
 
+    #[tokio::test]
     async fn block_by_block_spec_eip1898_hashes() -> Result<()> {
-        todo!("Not implemented yet");
+        let fixture = NodeTestFixture::new().await?;
+
+        let block = fixture
+            .node
+            .block_by_block_spec(&BlockSpec::Tag(BlockTag::Earliest))
+            .await
+            .unwrap();
+
+        let block_hash = block.header().hash();
+
+        async fn assert_block_hash(
+            fixture: &NodeTestFixture,
+            block_hash: &B256,
+            require_canonical: Option<bool>,
+        ) {
+            let block_by_hash = fixture
+                .node
+                .block_by_block_spec(&BlockSpec::Eip1898(Eip1898BlockSpec::Hash {
+                    block_hash: *block_hash,
+                    require_canonical,
+                }))
+                .await
+                .unwrap();
+
+            assert_eq!(block_by_hash.header().hash(), *block_hash);
+        }
+
+        assert_block_hash(&fixture, &block_hash, None).await;
+        assert_block_hash(&fixture, &block_hash, Some(true)).await;
+        assert_block_hash(&fixture, &block_hash, Some(false)).await;
+
+        let non_existing_block = fixture
+            .node
+            .block_by_block_spec(&BlockSpec::Eip1898(Eip1898BlockSpec::Hash {
+                block_hash: B256::zero(),
+                require_canonical: None,
+            }))
+            .await;
+
+        assert_error!(
+            non_existing_block,
+            NodeError::UnknownBlockHash { block_hash } => assert_eq!(block_hash, B256::zero())
+        );
 
         Ok(())
     }
 
+    #[tokio::test]
     async fn block_by_hash() -> Result<()> {
-        todo!("Not implemented yet");
+        let fixture = NodeTestFixture::new().await?;
+
+        let block = fixture
+            .node
+            .block_by_block_spec(&BlockSpec::Tag(BlockTag::Earliest))
+            .await
+            .unwrap();
+
+        let block_hash = block.header().hash();
+
+        let block_by_hash = fixture
+            .node
+            .block_by_hash(&block_hash)
+            .await
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(block_by_hash.header().hash(), block_hash);
+
+        let non_existing_block = fixture.node.block_by_hash(&B256::zero()).await.unwrap();
+
+        assert!(non_existing_block.is_none());
 
         Ok(())
     }

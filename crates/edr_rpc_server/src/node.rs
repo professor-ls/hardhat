@@ -2,6 +2,8 @@ use std::mem;
 use std::sync::Arc;
 use std::time::{SystemTime, SystemTimeError, UNIX_EPOCH};
 
+use edr_eth::receipt::BlockReceipt;
+use edr_eth::transaction::SignedTransaction;
 use edr_eth::{
     remote::{BlockSpec, BlockTag, Eip1898BlockSpec},
     Address, SpecId, B256, U256,
@@ -255,23 +257,151 @@ impl Node {
 
         let block = node_data.block_by_block_spec(block_spec).await?;
 
-        // Temporary workaround until this gets fixed
-        // https://github.com/NomicFoundation/edr/issues/186
-        if block_spec == &BlockSpec::Tag(BlockTag::Pending) {
-            let prev_block = block.header().number - U256::from(1);
-            node_data.blockchain.revert_to_block(&prev_block).await?;
-        }
+        self.workaround_block_by_spec(&mut *node_data.blockchain, block_spec)
+            .await?;
 
         Ok(block)
     }
 
     pub async fn block_by_hash(
         &self,
-        hash: &B256,
+        block_hash: &B256,
     ) -> Result<Option<Arc<dyn SyncBlock<Error = BlockchainError>>>, BlockchainError> {
         let node_data = self.lock_data().await;
 
-        node_data.blockchain.block_by_hash(hash).await
+        node_data.blockchain.block_by_hash(block_hash).await
+    }
+
+    pub async fn block_transaction_count_by_hash(
+        &self,
+        block_hash: &B256,
+    ) -> Result<Option<usize>, BlockchainError> {
+        let node_data = self.lock_data().await;
+
+        Ok(node_data
+            .blockchain
+            .block_by_hash(block_hash)
+            .await?
+            .map(|block| block.transactions().len()))
+    }
+
+    pub async fn block_transaction_count_by_block_spec(
+        &self,
+        block_spec: &BlockSpec,
+    ) -> Result<usize, NodeError> {
+        let mut node_data = self.lock_data().await;
+
+        let count = node_data
+            .block_by_block_spec(block_spec)
+            .await?
+            .transactions()
+            .len();
+
+        self.workaround_block_by_spec(&mut *node_data.blockchain, block_spec)
+            .await?;
+
+        Ok(count)
+    }
+
+    pub async fn transaction_by_block_hash_and_index(
+        &self,
+        block_hash: &B256,
+        index: usize,
+    ) -> Result<Option<SignedTransaction>, BlockchainError> {
+        let node_data = self.lock_data().await;
+
+        Ok(node_data
+            .blockchain
+            .block_by_hash(block_hash)
+            .await?
+            .and_then(|block| block.transactions().get(index).cloned()))
+    }
+
+    pub async fn transaction_by_block_spec_and_index(
+        &self,
+        block_spec: &BlockSpec,
+        index: usize,
+    ) -> Result<Option<SignedTransaction>, NodeError> {
+        let mut node_data = self.lock_data().await;
+
+        let tx = node_data
+            .block_by_block_spec(block_spec)
+            .await?
+            .transactions()
+            .get(index)
+            .cloned();
+
+        self.workaround_block_by_spec(&mut *node_data.blockchain, block_spec)
+            .await?;
+
+        Ok(tx)
+    }
+
+    pub async fn transaction_count(
+        &self,
+        address: Address,
+        block_spec: BlockSpec,
+    ) -> Result<u64, NodeError> {
+        self.execute_in_block_context::<Result<u64, NodeError>>(
+            Some(block_spec),
+            move |node_data| {
+                Ok(node_data
+                    .state
+                    .basic(address)?
+                    .map_or(0, |account| account.nonce))
+            },
+        )
+        .await?
+    }
+
+    pub async fn transaction_by_hash(
+        &self,
+        hash: &B256,
+    ) -> Result<Option<SignedTransaction>, BlockchainError> {
+        let node_data = self.lock_data().await;
+
+        let transaction = if let Some(tx) = node_data.mem_pool.transaction_by_hash(hash) {
+            Some(tx.transaction().transaction().clone())
+        } else if let Some(tx_block) = node_data.blockchain.block_by_transaction_hash(hash).await? {
+            let tx_index = node_data
+                .blockchain
+                .receipt_by_transaction_hash(hash)
+                .await?
+                .expect("If the transaction was inserted in a block, it must have a receipt")
+                .transaction_index;
+
+            let tx_index =
+                usize::try_from(tx_index).expect("Indices cannot be larger than usize::MAX");
+            Some(tx_block.transactions()[tx_index].clone())
+        } else {
+            None
+        };
+
+        Ok(transaction)
+    }
+
+    pub async fn transaction_receipt(
+        &self,
+        hash: &B256,
+    ) -> Result<Option<Arc<BlockReceipt>>, BlockchainError> {
+        let node_data = self.lock_data().await;
+
+        node_data.blockchain.receipt_by_transaction_hash(hash).await
+    }
+
+    // Temporary workaround until this gets fixed
+    // https://github.com/NomicFoundation/edr/issues/186
+    async fn workaround_block_by_spec(
+        &self,
+        blockchain: &mut dyn SyncBlockchain<BlockchainError, StateError>,
+        block_spec: &BlockSpec,
+    ) -> Result<(), NodeError> {
+        if block_spec == &BlockSpec::Tag(BlockTag::Pending) {
+            let prev_block_number = blockchain.last_block_number().await - U256::from(1);
+            blockchain.revert_to_block(&prev_block_number).await?;
+        }
+
+        Ok(())
     }
 }
 
@@ -788,6 +918,274 @@ pub(crate) mod tests {
         let non_existing_block = fixture.node.block_by_hash(&B256::zero()).await.unwrap();
 
         assert!(non_existing_block.is_none());
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn block_transaction_count_by_hash() -> Result<()> {
+        let fixture = NodeTestFixture::new().await?;
+
+        let block = fixture
+            .node
+            .block_by_block_spec(&BlockSpec::Tag(BlockTag::Earliest))
+            .await
+            .unwrap();
+
+        let block_hash = block.header().hash();
+
+        let count = fixture
+            .node
+            .block_transaction_count_by_hash(&block_hash)
+            .await
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(count, 0);
+
+        let non_existing_count = fixture
+            .node
+            .block_transaction_count_by_hash(&B256::zero())
+            .await
+            .unwrap();
+
+        assert_eq!(non_existing_count, None);
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn block_transaction_count_by_block_spec() -> Result<()> {
+        let fixture = NodeTestFixture::new().await?;
+
+        let block = fixture
+            .node
+            .block_by_block_spec(&BlockSpec::Tag(BlockTag::Earliest))
+            .await
+            .unwrap();
+
+        async fn assert_block_transaction_count(
+            fixture: &NodeTestFixture,
+            block_spec: BlockSpec,
+            expected_count: usize,
+        ) {
+            let count = fixture
+                .node
+                .block_transaction_count_by_block_spec(&block_spec)
+                .await
+                .unwrap();
+
+            assert_eq!(count, expected_count);
+        }
+
+        assert_block_transaction_count(&fixture, BlockSpec::Tag(BlockTag::Earliest), 0).await;
+        assert_block_transaction_count(&fixture, BlockSpec::Tag(BlockTag::Latest), 0).await;
+        assert_block_transaction_count(&fixture, BlockSpec::Tag(BlockTag::Pending), 0).await;
+        assert_block_transaction_count(&fixture, BlockSpec::Number(U256::from(0)), 0).await;
+
+        assert_block_transaction_count(
+            &fixture,
+            BlockSpec::Eip1898(Eip1898BlockSpec::Number {
+                block_number: U256::from(0),
+            }),
+            0,
+        )
+        .await;
+
+        assert_block_transaction_count(
+            &fixture,
+            BlockSpec::Eip1898(Eip1898BlockSpec::Hash {
+                block_hash: block.header().hash(),
+                require_canonical: None,
+            }),
+            0,
+        )
+        .await;
+
+        let non_existing_count = fixture
+            .node
+            .block_transaction_count_by_block_spec(&BlockSpec::Number(U256::from(1)))
+            .await;
+
+        assert_error!(non_existing_count, NodeError::UnknownBlockNumber { block_number } => assert_eq!(block_number, U256::from(1)));
+
+        let non_existing_count = fixture
+            .node
+            .block_transaction_count_by_block_spec(&BlockSpec::Eip1898(Eip1898BlockSpec::Number {
+                block_number: U256::from(1),
+            }))
+            .await;
+
+        assert_error!(non_existing_count, NodeError::UnknownBlockNumber { block_number } => assert_eq!(block_number, U256::from(1)));
+
+        let non_existing_count = fixture
+            .node
+            .block_transaction_count_by_block_spec(&BlockSpec::Eip1898(Eip1898BlockSpec::Hash {
+                block_hash: B256::zero(),
+                require_canonical: None,
+            }))
+            .await;
+
+        assert_error!(non_existing_count, NodeError::UnknownBlockHash { block_hash } => assert_eq!(block_hash, B256::zero()));
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn transaction_by_block_hash_and_index() -> Result<()> {
+        let fixture = NodeTestFixture::new().await?;
+
+        let block = fixture
+            .node
+            .block_by_block_spec(&BlockSpec::Tag(BlockTag::Latest))
+            .await?;
+
+        let tx = fixture
+            .node
+            .transaction_by_block_hash_and_index(&block.header().hash(), 0)
+            .await
+            .unwrap();
+
+        assert_eq!(tx, None);
+
+        let non_existing_block_tx = fixture
+            .node
+            .transaction_by_block_hash_and_index(&B256::zero(), 0)
+            .await
+            .unwrap();
+
+        assert_eq!(non_existing_block_tx, None);
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn transaction_by_block_spec_and_index() -> Result<()> {
+        let fixture = NodeTestFixture::new().await?;
+
+        let tx = fixture
+            .node
+            .transaction_by_block_spec_and_index(&BlockSpec::Tag(BlockTag::Latest), 0)
+            .await
+            .unwrap();
+
+        assert_eq!(tx, None);
+
+        let non_existing_block_tx = fixture
+            .node
+            .transaction_by_block_spec_and_index(&BlockSpec::Number(U256::from(1)), 0)
+            .await;
+
+        assert_error!(non_existing_block_tx, NodeError::UnknownBlockNumber { block_number } => assert_eq!(block_number, U256::from(1)));
+
+        let non_existing_block_tx = fixture
+            .node
+            .transaction_by_block_spec_and_index(
+                &BlockSpec::Eip1898(Eip1898BlockSpec::Number {
+                    block_number: U256::from(1),
+                }),
+                0,
+            )
+            .await;
+
+        assert_error!(non_existing_block_tx, NodeError::UnknownBlockNumber { block_number } => assert_eq!(block_number, U256::from(1)));
+
+        let non_existing_block_tx = fixture
+            .node
+            .transaction_by_block_spec_and_index(
+                &BlockSpec::Eip1898(Eip1898BlockSpec::Hash {
+                    block_hash: B256::zero(),
+                    require_canonical: None,
+                }),
+                0,
+            )
+            .await;
+
+        assert_error!(non_existing_block_tx, NodeError::UnknownBlockHash { block_hash } => assert_eq!(block_hash, B256::zero()));
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn transaction_count() -> Result<()> {
+        let fixture = NodeTestFixture::new().await?;
+
+        let count = fixture
+            .node
+            .transaction_count(Address::zero(), BlockSpec::Tag(BlockTag::Earliest))
+            .await
+            .unwrap();
+
+        assert_eq!(count, 0);
+
+        let count = fixture
+            .node
+            .transaction_count(Address::zero(), BlockSpec::Tag(BlockTag::Latest))
+            .await
+            .unwrap();
+
+        assert_eq!(count, 0);
+
+        let non_existing_count = fixture
+            .node
+            .transaction_count(Address::zero(), BlockSpec::Number(U256::from(1)))
+            .await;
+
+        assert_error!(non_existing_count, NodeError::UnknownBlockNumber { block_number } => assert_eq!(block_number, U256::from(1)));
+
+        let non_existing_count = fixture
+            .node
+            .transaction_count(
+                Address::zero(),
+                BlockSpec::Eip1898(Eip1898BlockSpec::Number {
+                    block_number: U256::from(1),
+                }),
+            )
+            .await;
+
+        assert_error!(non_existing_count, NodeError::UnknownBlockNumber { block_number } => assert_eq!(block_number, U256::from(1)));
+
+        let non_existing_count = fixture
+            .node
+            .transaction_count(
+                Address::zero(),
+                BlockSpec::Eip1898(Eip1898BlockSpec::Hash {
+                    block_hash: B256::zero(),
+                    require_canonical: None,
+                }),
+            )
+            .await;
+
+        assert_error!(non_existing_count, NodeError::UnknownBlockHash { block_hash } => assert_eq!(block_hash, B256::zero()));
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn transaction_by_hash() -> Result<()> {
+        let fixture = NodeTestFixture::new().await?;
+
+        let non_existing_tx = fixture
+            .node
+            .transaction_by_hash(&B256::zero())
+            .await
+            .unwrap();
+
+        assert_eq!(non_existing_tx, None);
+
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn transaction_receipt() -> Result<()> {
+        let fixture = NodeTestFixture::new().await?;
+
+        let non_existing_receipt = fixture
+            .node
+            .transaction_receipt(&B256::zero())
+            .await
+            .unwrap();
+
+        assert_eq!(non_existing_receipt, None);
 
         Ok(())
     }

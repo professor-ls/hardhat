@@ -94,6 +94,11 @@ impl PendingTransaction {
         (self.transaction, self.caller)
     }
 
+    /// Returns the inner signed transaction
+    pub fn transaction(&self) -> &SignedTransaction {
+        &self.transaction
+    }
+
     fn initial_cost(spec_id: SpecId, transaction: &SignedTransaction) -> u64 {
         let access_list: Option<Vec<(Address, Vec<U256>)>> =
             transaction.access_list().cloned().map(Into::into);

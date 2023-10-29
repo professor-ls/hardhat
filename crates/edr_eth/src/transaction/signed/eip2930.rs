@@ -121,8 +121,7 @@ mod tests {
     use k256::SecretKey;
     use revm_primitives::Address;
 
-    use crate::access_list::AccessListItem;
-    use crate::signature::secret_key_from_str;
+    use crate::{access_list::AccessListItem, signature::secret_key_from_str};
 
     use super::*;
 

@@ -1,6 +1,4 @@
-use std::net::SocketAddr;
-use std::path::PathBuf;
-use std::{str::FromStr, time::SystemTime};
+use std::{net::SocketAddr, path::PathBuf, str::FromStr, time::SystemTime};
 
 use anyhow::anyhow;
 use edr_eth::{serde::ZeroXPrefixedBytes, Address, Bytes, SpecId, U256};

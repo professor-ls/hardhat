@@ -1,7 +1,9 @@
-use std::ffi::OsString;
-use std::fs;
-use std::net::{IpAddr, Ipv4Addr};
-use std::path::{Path, PathBuf};
+use std::{
+    ffi::OsString,
+    fs,
+    net::{IpAddr, Ipv4Addr},
+    path::{Path, PathBuf},
+};
 
 use anyhow::anyhow;
 use clap::{Args, Parser, Subcommand};

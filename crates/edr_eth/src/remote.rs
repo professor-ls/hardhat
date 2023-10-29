@@ -1,5 +1,7 @@
-use std::fmt;
-use std::fmt::{Display, Formatter};
+use std::{
+    fmt,
+    fmt::{Display, Formatter},
+};
 
 /// an Ethereum JSON-RPC client
 pub mod client;

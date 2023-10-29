@@ -1,11 +1,14 @@
 use crate::block::{is_safe_block_number, IsSafeBlockNumberArgs};
 use revm_primitives::{Address, B256};
-use sha3::digest::FixedOutput;
-use sha3::{Digest, Sha3_256};
+use sha3::{digest::FixedOutput, Digest, Sha3_256};
 
-use crate::remote::methods::{GetLogsInput, MethodInvocation};
-use crate::remote::{BlockSpec, BlockTag, Eip1898BlockSpec};
-use crate::U256;
+use crate::{
+    remote::{
+        methods::{GetLogsInput, MethodInvocation},
+        BlockSpec, BlockTag, Eip1898BlockSpec,
+    },
+    U256,
+};
 
 pub(super) fn try_read_cache_key(method_invocation: &MethodInvocation) -> Option<ReadCacheKey> {
     CacheableMethodInvocation::try_from(method_invocation)

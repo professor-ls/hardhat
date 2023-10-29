@@ -1,9 +1,9 @@
-use std::collections::{HashMap, VecDeque};
-use std::path::{Path, PathBuf};
-use std::time::{Duration, Instant};
 use std::{
+    collections::{HashMap, VecDeque},
     io,
+    path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
+    time::{Duration, Instant},
 };
 
 use itertools::{izip, Itertools};
@@ -20,13 +20,19 @@ use sha3::{digest::FixedOutput, Digest, Sha3_256};
 use tokio::sync::{OnceCell, RwLock};
 use uuid::Uuid;
 
-use crate::block::{block_time, is_safe_block_number, IsSafeBlockNumberArgs};
-use crate::remote::cacheable_method_invocation::{
-    try_read_cache_key, try_write_cache_key, CacheKeyForSymbolicBlockTag,
-    CacheKeyForUncheckedBlockNumber, ReadCacheKey, ResolvedSymbolicTag, WriteCacheKey,
+use crate::{
+    block::{block_time, is_safe_block_number, IsSafeBlockNumberArgs},
+    log::FilterLog,
+    receipt::BlockReceipt,
+    remote::{
+        cacheable_method_invocation::{
+            try_read_cache_key, try_write_cache_key, CacheKeyForSymbolicBlockTag,
+            CacheKeyForUncheckedBlockNumber, ReadCacheKey, ResolvedSymbolicTag, WriteCacheKey,
+        },
+        jsonrpc::Id,
+    },
+    serde::ZeroXPrefixedBytes,
 };
-use crate::remote::jsonrpc::Id;
-use crate::{log::FilterLog, receipt::BlockReceipt, serde::ZeroXPrefixedBytes};
 
 use super::{
     eth, jsonrpc,
@@ -963,8 +969,7 @@ impl SerializedRequest {
 
 #[cfg(test)]
 mod tests {
-    use std::ops::Deref;
-    use std::str::FromStr;
+    use std::{ops::Deref, str::FromStr};
 
     use reqwest::StatusCode;
     use tempfile::TempDir;

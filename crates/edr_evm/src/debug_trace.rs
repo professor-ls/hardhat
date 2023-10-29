@@ -1,18 +1,17 @@
-use crate::blockchain::SyncBlockchain;
-use crate::evm::build_evm;
-use crate::state::SyncState;
-use crate::{PendingTransaction, TransactionError};
-use edr_eth::signature::SignatureError;
-use edr_eth::B256;
-use revm::inspectors::GasInspector;
-use revm::interpreter::{
-    opcode, CallInputs, CreateInputs, Gas, InstructionResult, Interpreter, Stack,
+use crate::{
+    blockchain::SyncBlockchain, evm::build_evm, state::SyncState, PendingTransaction,
+    TransactionError,
 };
-use revm::primitives::{hex, Address, B160, U256};
-use revm::primitives::{BlockEnv, Bytes, CfgEnv, ExecutionResult, ResultAndState, SpecId};
-use revm::{EVMData, Inspector, JournalEntry};
-use std::collections::HashMap;
-use std::fmt::Debug;
+use edr_eth::{signature::SignatureError, B256};
+use revm::{
+    inspectors::GasInspector,
+    interpreter::{opcode, CallInputs, CreateInputs, Gas, InstructionResult, Interpreter, Stack},
+    primitives::{
+        hex, Address, BlockEnv, Bytes, CfgEnv, ExecutionResult, ResultAndState, SpecId, B160, U256,
+    },
+    EVMData, Inspector, JournalEntry,
+};
+use std::{collections::HashMap, fmt::Debug};
 
 /// Get trace output for `debug_traceTransaction`
 #[cfg_attr(feature = "tracing", tracing::instrument)]

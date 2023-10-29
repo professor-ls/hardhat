@@ -1,5 +1,7 @@
-use napi::bindgen_prelude::{BigInt, Buffer};
-use napi::Status;
+use napi::{
+    bindgen_prelude::{BigInt, Buffer},
+    Status,
+};
 use napi_derive::napi;
 use std::collections::HashMap;
 
@@ -8,9 +10,13 @@ use edr_evm::{
     execution_result_to_debug_result, BlockEnv, CfgEnv, ResultAndState, TracerEip3155, TxEnv,
 };
 
-use crate::transaction::{PendingTransaction, TransactionRequest};
 use crate::{
-    block::BlockConfig, blockchain::Blockchain, cast::TryCast, config::ConfigOptions, state::State,
+    block::BlockConfig,
+    blockchain::Blockchain,
+    cast::TryCast,
+    config::ConfigOptions,
+    state::State,
+    transaction::{PendingTransaction, TransactionRequest},
 };
 
 /// Get trace output for `debug_traceTransaction`

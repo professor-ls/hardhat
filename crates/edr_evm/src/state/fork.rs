@@ -237,8 +237,10 @@ impl StateDebug for ForkState {
 
 #[cfg(all(test, feature = "test-remote"))]
 mod tests {
-    use std::ops::{Deref, DerefMut};
-    use std::str::FromStr;
+    use std::{
+        ops::{Deref, DerefMut},
+        str::FromStr,
+    };
 
     use edr_test_utils::env::get_alchemy_url;
 

@@ -151,7 +151,8 @@ pub struct DebugTraceResult {
 /// The output of an EIP-3155 trace.
 /// The required fields match <https://eips.ethereum.org/EIPS/eip-3155#output> except for
 /// `returnData` and `refund` which are not used currently by Hardhat.
-/// The `opName`, `error`, `memory` and `storage` optional fields are supported as well.
+/// The `opName`, `error`, `memory` and `storage` optional fields are supported
+/// as well.
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
 pub struct DebugTraceLogItem {
     /// Program Counter

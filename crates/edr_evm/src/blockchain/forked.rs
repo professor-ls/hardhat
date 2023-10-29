@@ -401,7 +401,8 @@ impl BlockchainMut for ForkedBlockchain {
 
         let total_difficulty = previous_total_difficulty + block.header().difficulty;
 
-        // SAFETY: The block number is guaranteed to be unique, so the block hash must be too.
+        // SAFETY: The block number is guaranteed to be unique, so the block hash must
+        // be too.
         let block = unsafe {
             self.local_storage
                 .insert_block_unchecked(block, state_diff, total_difficulty)

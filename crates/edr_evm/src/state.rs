@@ -25,8 +25,8 @@ pub use self::{
     trie::{AccountTrie, TrieState},
 };
 
-/// The difference between two states, which can be applied to a state to get the new state
-/// using [`revm::db::DatabaseCommit::commit`].
+/// The difference between two states, which can be applied to a state to get
+/// the new state using [`revm::db::DatabaseCommit::commit`].
 pub type StateDiff = HashMap<Address, Account>;
 
 /// Combinatorial error for the state API

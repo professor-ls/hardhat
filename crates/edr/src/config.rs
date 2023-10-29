@@ -14,7 +14,8 @@ pub use super::NodeArgs;
 mod number;
 pub use number::{u256_number, u64_number, Number};
 
-/// struct representing the deserialized conifguration file, eg hardhat.config.json
+/// struct representing the deserialized conifguration file, eg
+/// hardhat.config.json
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 #[serde(default)]
 pub struct ConfigFile {
@@ -143,8 +144,8 @@ mod tests {
         assert_eq!(config_file, deserialized);
     }
 
-    /// test that specifying a non-default value for one field still allows the other fields to
-    /// take their default values.
+    /// test that specifying a non-default value for one field still allows the
+    /// other fields to take their default values.
     #[test]
     fn test_config_file_mixed_defaults() {
         let original = "chain_id = 999";

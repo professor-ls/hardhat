@@ -26,7 +26,8 @@ enum Command {
         #[clap(long, short, default_value = "3")]
         iterations: usize,
     },
-    /// Compare JSON format test execution outputs for slower tests. Pass the --reporter json argument to mocha to generate the input files.
+    /// Compare JSON format test execution outputs for slower tests. Pass the
+    /// --reporter json argument to mocha to generate the input files.
     CompareTestRuns {
         /// The path to the baseline test run
         baseline: PathBuf,

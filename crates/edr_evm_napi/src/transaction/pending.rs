@@ -81,8 +81,8 @@ impl PendingTransaction {
         &self,
         env: Env,
     ) -> napi::Result<
-        // HACK: napi does not convert Rust type aliases to its underlaying types when generating bindings
-        // so manually do that here
+        // HACK: napi does not convert Rust type aliases to its underlaying types when generating
+        // bindings so manually do that here
         Either4<
             LegacySignedTransaction,
             Eip2930SignedTransaction,

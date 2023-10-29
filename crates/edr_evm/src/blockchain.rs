@@ -96,7 +96,8 @@ pub trait Blockchain {
         number: u64,
     ) -> Result<Option<Arc<dyn SyncBlock<Error = Self::BlockchainError>>>, Self::BlockchainError>;
 
-    /// Retrieves the block that contains a transaction with the provided hash, if it exists.
+    /// Retrieves the block that contains a transaction with the provided hash,
+    /// if it exists.
     async fn block_by_transaction_hash(
         &self,
         transaction_hash: &B256,
@@ -113,13 +114,15 @@ pub trait Blockchain {
     /// Retrieves the last block number in the blockchain.
     async fn last_block_number(&self) -> u64;
 
-    /// Retrieves the receipt of the transaction with the provided hash, if it exists.
+    /// Retrieves the receipt of the transaction with the provided hash, if it
+    /// exists.
     async fn receipt_by_transaction_hash(
         &self,
         transaction_hash: &B256,
     ) -> Result<Option<Arc<BlockReceipt>>, Self::BlockchainError>;
 
-    /// Retrieves the hardfork specification of the block at the provided number.
+    /// Retrieves the hardfork specification of the block at the provided
+    /// number.
     async fn spec_at_block_number(
         &self,
         block_number: u64,
@@ -147,17 +150,20 @@ pub trait BlockchainMut {
     /// The blockchain's error type
     type Error;
 
-    /// Inserts the provided block into the blockchain, returning a reference to the inserted block.
+    /// Inserts the provided block into the blockchain, returning a reference to
+    /// the inserted block.
     async fn insert_block(
         &mut self,
         block: LocalBlock,
         state_diff: StateDiff,
     ) -> Result<Arc<dyn SyncBlock<Error = Self::Error>>, Self::Error>;
 
-    /// Reserves the provided number of blocks, starting from the next block number.
+    /// Reserves the provided number of blocks, starting from the next block
+    /// number.
     async fn reserve_blocks(&mut self, additional: u64, interval: u64) -> Result<(), Self::Error>;
 
-    /// Reverts to the block with the provided number, deleting all later blocks.
+    /// Reverts to the block with the provided number, deleting all later
+    /// blocks.
     async fn revert_to_block(&mut self, block_number: u64) -> Result<(), Self::Error>;
 }
 

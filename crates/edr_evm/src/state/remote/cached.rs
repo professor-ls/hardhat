@@ -50,7 +50,8 @@ impl State for CachedRemoteState {
         if let Some(mut account_info) = self.remote.basic(address)? {
             // Split code and store separately
             // Always cache code regardless of the block number for two reasons:
-            // 1. It's an invariant of this trait getting an `AccountInfo` by calling `basic`,
+            // 1. It's an invariant of this trait getting an `AccountInfo` by calling
+            //    `basic`,
             // one can call `code_by_hash` with `AccountInfo.code_hash` and get the code.
             // 2. Since the code is identified by its hash, it never goes stale.
             if let Some(code) = account_info.code.take() {

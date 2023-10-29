@@ -26,8 +26,8 @@ pub struct RemoteState {
 }
 
 impl RemoteState {
-    /// Construct a new instance using an RPC client for a remote Ethereum node and a block number
-    /// from which data will be pulled.
+    /// Construct a new instance using an RPC client for a remote Ethereum node
+    /// and a block number from which data will be pulled.
     pub fn new(runtime: runtime::Handle, client: Arc<RpcClient>, block_number: u64) -> Self {
         Self {
             client,

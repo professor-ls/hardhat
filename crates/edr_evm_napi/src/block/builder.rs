@@ -33,8 +33,8 @@ pub struct BlockBuilder {
 
 #[napi]
 impl BlockBuilder {
-    // TODO: There seems to be a limitation in napi-rs that prevents us from creating
-    // a #[napi(factory)] with an async fn
+    // TODO: There seems to be a limitation in napi-rs that prevents us from
+    // creating a #[napi(factory)] with an async fn
     #[napi(ts_return_type = "Promise<BlockBuilder>")]
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub fn create(
@@ -140,8 +140,8 @@ impl BlockBuilder {
         Ok(promise)
     }
 
-    /// This call consumes the [`BlockBuilder`] object in Rust. Afterwards, you can no longer call
-    /// methods on the JS object.
+    /// This call consumes the [`BlockBuilder`] object in Rust. Afterwards, you
+    /// can no longer call methods on the JS object.
     #[napi]
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub async fn finalize(

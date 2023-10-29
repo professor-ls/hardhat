@@ -148,7 +148,8 @@ pub struct Request<MethodInvocation> {
 }
 
 /// A client for executing RPC methods on a remote Ethereum node.
-/// The client caches responses based on chain id, so it's important to not use it with local nodes.
+/// The client caches responses based on chain id, so it's important to not use
+/// it with local nodes.
 #[derive(Debug)]
 pub struct RpcClient {
     url: String,
@@ -162,7 +163,8 @@ pub struct RpcClient {
 
 impl RpcClient {
     /// Create a new instance, given a remote node URL.
-    /// The cache directory is the global EDR cache directory configured by the user.
+    /// The cache directory is the global EDR cache directory configured by the
+    /// user.
     pub fn new(url: &str, cache_dir: PathBuf) -> Self {
         let retry_policy = ExponentialBackoff::builder()
             .retry_bounds(MIN_RETRY_INTERVAL, MAX_RETRY_INTERVAL)
@@ -176,8 +178,9 @@ impl RpcClient {
             .build();
 
         let rpc_cache_dir = cache_dir.join(RPC_CACHE_DIR);
-        // We aren't using the system temporary directories as they may be on a different a file
-        // system which would cause the rename call later to fail.
+        // We aren't using the system temporary directories as they may be on a
+        // different a file system which would cause the rename call later to
+        // fail.
         let tmp_dir = rpc_cache_dir.join(TMP_DIR);
 
         RpcClient {
@@ -413,11 +416,13 @@ impl RpcClient {
 
         // 2. Then move the temporary file to the cache path.
         // This is guaranteed to be atomic on Unix platforms.
-        // There is no such guarantee on Windows, as there is no OS support for atomic move before
-        // Windows 10, but Rust will drop support for earlier versions of Windows in the future:
-        // <https://github.com/rust-lang/compiler-team/issues/651>. Hopefully the standard
-        // library will adapt its `rename` implementation to use the new atomic move API in Windows
-        // 10. In any case, if a cache file is corrupted, we detect and remove it when reading it.
+        // There is no such guarantee on Windows, as there is no OS support for atomic
+        // move before Windows 10, but Rust will drop support for earlier
+        // versions of Windows in the future: <https://github.com/rust-lang/compiler-team/issues/651>. Hopefully the standard
+        // library will adapt its `rename` implementation to use the new atomic move API
+        // in Windows
+        // 10. In any case, if a cache file is corrupted, we detect and remove it when
+        //     reading it.
         let cache_path = self.make_cache_path(cache_key).await?;
         match tokio::fs::rename(&tmp_path, cache_path).await {
             Ok(_) => (),
@@ -526,8 +531,8 @@ impl RpcClient {
         Ok(result)
     }
 
-    // We have two different `call` methods to avoid creating recursive async functions as the
-    // cached path calls `eth_chainId` without caching.
+    // We have two different `call` methods to avoid creating recursive async
+    // functions as the cached path calls `eth_chainId` without caching.
     async fn call_without_cache<T: DeserializeOwned>(
         &self,
         method_invocation: MethodInvocation,
@@ -668,8 +673,8 @@ impl RpcClient {
         Ok(chain_id)
     }
 
-    /// Submit a consolidated batch of RPC method invocations in order to obtain the set of data
-    /// contained in [`AccountInfo`].
+    /// Submit a consolidated batch of RPC method invocations in order to obtain
+    /// the set of data contained in [`AccountInfo`].
     pub async fn get_account_info(
         &self,
         address: &Address,
@@ -839,7 +844,8 @@ impl CachedBlockNumber {
     }
 }
 
-/// Don't fail the request, just log an error if we fail to read/write from cache.
+/// Don't fail the request, just log an error if we fail to read/write from
+/// cache.
 fn log_cache_error(cache_key: &str, message: &'static str, error: impl Into<CacheError>) {
     let cache_error = RpcClientError::CacheError {
         message: message.to_string(),
@@ -881,7 +887,8 @@ impl RetryableStrategy for RetryStrategy {
 
 // Adapted from <https://github.com/TrueLayer/reqwest-middleware/blob/a54319a9d65926c899440e5970c04592f30ed048/reqwest-retry/src/retryable_strategy.rs#L134>
 // under the MIT license.
-// With the difference that we don't retry on connection errors as it leads to retrying invalid domains.
+// With the difference that we don't retry on connection errors as it leads to
+// retrying invalid domains.
 fn on_request_failure(error: &reqwest_middleware::Error) -> Option<Retryable> {
     use reqwest_middleware::Error;
 
@@ -898,19 +905,23 @@ fn on_request_failure(error: &reqwest_middleware::Error) -> Option<Retryable> {
             {
                 Some(Retryable::Fatal)
             } else if error.is_request() {
-                // It seems that hyper::Error(IncompleteMessage) is not correctly handled by reqwest.
-                // Here we check if the Reqwest error was originated by hyper and map it consistently.
+                // It seems that hyper::Error(IncompleteMessage) is not correctly handled by
+                // reqwest. Here we check if the Reqwest error was originated by
+                // hyper and map it consistently.
                 if let Some(hyper_error) = get_source_error_type::<hyper::Error>(&error) {
-                    // The hyper::Error(IncompleteMessage) is raised if the HTTP response is well formatted but does not contain all the bytes.
-                    // This can happen when the server has started sending back the response but the connection is cut halfway thorugh.
-                    // We can safely retry the call, hence marking this error as [`Retryable::Transient`].
+                    // The hyper::Error(IncompleteMessage) is raised if the HTTP response is well
+                    // formatted but does not contain all the bytes.
+                    // This can happen when the server has started sending back the response but the
+                    // connection is cut halfway thorugh. We can safely retry
+                    // the call, hence marking this error as [`Retryable::Transient`].
                     // Instead hyper::Error(Canceled) is raised when the connection is
                     // gracefully closed on the server side.
                     if hyper_error.is_incomplete_message() || hyper_error.is_canceled() {
                         Some(Retryable::Transient)
 
-                        // Try and downcast the hyper error to io::Error if that is the
-                        // underlying error, and try and classify it.
+                        // Try and downcast the hyper error to io::Error if that
+                        // is the underlying error, and
+                        // try and classify it.
                     } else if let Some(io_error) = get_source_error_type::<io::Error>(hyper_error) {
                         Some(classify_io_error(io_error))
                     } else {

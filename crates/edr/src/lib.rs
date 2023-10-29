@@ -25,9 +25,11 @@ struct Cli {
 #[derive(Subcommand)]
 #[allow(clippy::large_enum_variant)]
 enum Command {
-    /// Start the local Ethereum development node to serve JSON-RPC requests over HTTP.
+    /// Start the local Ethereum development node to serve JSON-RPC requests
+    /// over HTTP.
     Node(NodeArgs),
-    /// Write default configuration values to edr.toml, overwriting any existing file.
+    /// Write default configuration values to edr.toml, overwriting any existing
+    /// file.
     InitConfigFile,
 }
 

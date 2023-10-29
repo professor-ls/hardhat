@@ -49,7 +49,8 @@ pub struct LocalBlockchain {
 }
 
 impl LocalBlockchain {
-    /// Constructs a new instance using the provided arguments to build a genesis block.
+    /// Constructs a new instance using the provided arguments to build a
+    /// genesis block.
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub fn new(
         genesis_state: TrieState,
@@ -115,7 +116,8 @@ impl LocalBlockchain {
         })
     }
 
-    /// Constructs a new instance with the provided genesis block, validating a zero block number.
+    /// Constructs a new instance with the provided genesis block, validating a
+    /// zero block number.
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub fn with_genesis_block(
         genesis_block: LocalBlock,
@@ -141,7 +143,8 @@ impl LocalBlockchain {
         })
     }
 
-    /// Constructs a new instance with the provided genesis block, without validating the provided block's number.
+    /// Constructs a new instance with the provided genesis block, without
+    /// validating the provided block's number.
     ///
     /// # Safety
     ///
@@ -291,7 +294,8 @@ impl BlockchainMut for LocalBlockchain {
 
         let total_difficulty = previous_total_difficulty + block.header().difficulty;
 
-        // SAFETY: The block number is guaranteed to be unique, so the block hash must be too.
+        // SAFETY: The block number is guaranteed to be unique, so the block hash must
+        // be too.
         let block = unsafe {
             self.storage
                 .insert_block_unchecked(block, state_diff, total_difficulty)

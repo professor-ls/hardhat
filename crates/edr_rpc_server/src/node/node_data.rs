@@ -76,9 +76,9 @@ impl NodeData {
     }
 }
 
-// Implement methods on `NodeData` as opposed to on `Node` that are helper methods for methods on
-// `Node` as these helper methods shouldn't try to acquire the lock in `Node`. That would lead to
-// deadlocks.
+// Implement methods on `NodeData` as opposed to on `Node` that are helper
+// methods for methods on `Node` as these helper methods shouldn't try to
+// acquire the lock in `Node`. That would lead to deadlocks.
 impl NodeData {
     pub async fn block_by_block_spec(
         &mut self,
@@ -222,8 +222,8 @@ impl NodeData {
         // Reset next block time stamp
         self.next_block_timestamp.take();
 
-        // TODO: when we support hardhat_setNextBlockBaseFeePerGas, reset the user provided
-        // next block base fee per gas to `None`
+        // TODO: when we support hardhat_setNextBlockBaseFeePerGas, reset the user
+        // provided next block base fee per gas to `None`
         // https://github.com/NomicFoundation/edr/issues/145
 
         Ok(result)

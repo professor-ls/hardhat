@@ -24,8 +24,8 @@ use crate::{
     state::State,
 };
 
-// An arbitrarily large amount of memory to signal to the javascript garbage collector that it needs to
-// attempt to free the blockchain object's memory.
+// An arbitrarily large amount of memory to signal to the javascript garbage
+// collector that it needs to attempt to free the blockchain object's memory.
 const BLOCKCHAIN_MEMORY_SIZE: i64 = 10_000;
 
 /// The EDR blockchain

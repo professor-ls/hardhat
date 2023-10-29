@@ -67,7 +67,8 @@ impl<BlockT: Block + Clone + From<RemoteBlock>, const FORCE_CACHING: bool>
         }
     }
 
-    /// Retrieves the block that contains a transaction with the provided hash, if it exists.
+    /// Retrieves the block that contains a transaction with the provided hash,
+    /// if it exists.
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub async fn block_by_transaction_hash(
         &self,
@@ -103,7 +104,8 @@ impl<BlockT: Block + Clone + From<RemoteBlock>, const FORCE_CACHING: bool>
         &self.client
     }
 
-    /// Retrieves the receipt of the transaction with the provided hash, if it exists.
+    /// Retrieves the receipt of the transaction with the provided hash, if it
+    /// exists.
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub async fn receipt_by_transaction_hash(
         &self,

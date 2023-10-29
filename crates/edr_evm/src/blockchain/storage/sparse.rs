@@ -59,7 +59,8 @@ impl<BlockT: Block + Clone + ?Sized> SparseBlockchainStorage<BlockT> {
         self.number_to_block.get(&number)
     }
 
-    /// Retrieves the block that contains the transaction with the provided hash, if it exists.
+    /// Retrieves the block that contains the transaction with the provided
+    /// hash, if it exists.
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub fn block_by_transaction_hash(&self, transaction_hash: &B256) -> Option<&BlockT> {
         self.transaction_hash_to_block.get(transaction_hash)
@@ -71,7 +72,8 @@ impl<BlockT: Block + Clone + ?Sized> SparseBlockchainStorage<BlockT> {
         self.number_to_block.contains_key(&block_number)
     }
 
-    /// Retrieves the receipt of the transaction with the provided hash, if it exists.
+    /// Retrieves the receipt of the transaction with the provided hash, if it
+    /// exists.
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub fn receipt_by_transaction_hash(
         &self,
@@ -80,7 +82,8 @@ impl<BlockT: Block + Clone + ?Sized> SparseBlockchainStorage<BlockT> {
         self.transaction_hash_to_receipt.get(transaction_hash)
     }
 
-    /// Reverts to the block with the provided number, deleting all later blocks.
+    /// Reverts to the block with the provided number, deleting all later
+    /// blocks.
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub fn revert_to_block(&mut self, block_number: u64) {
         let removed_blocks = self
@@ -108,7 +111,8 @@ impl<BlockT: Block + Clone + ?Sized> SparseBlockchainStorage<BlockT> {
         self.hash_to_total_difficulty.get(hash)
     }
 
-    /// Inserts a block, failing if a block with the same hash or number already exists.
+    /// Inserts a block, failing if a block with the same hash or number already
+    /// exists.
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub fn insert_block(
         &mut self,
@@ -144,8 +148,8 @@ impl<BlockT: Block + Clone + ?Sized> SparseBlockchainStorage<BlockT> {
     ///
     /// # Safety
     ///
-    /// Ensure that the instance does not contain a block with the same hash or number,
-    /// nor any transactions with the same hash.
+    /// Ensure that the instance does not contain a block with the same hash or
+    /// number, nor any transactions with the same hash.
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub unsafe fn insert_block_unchecked(
         &mut self,
@@ -176,7 +180,8 @@ impl<BlockT: Block + Clone + ?Sized> SparseBlockchainStorage<BlockT> {
     ///
     /// # Safety
     ///
-    /// Ensure that the instance does not contain a receipt with the same transaction hash.
+    /// Ensure that the instance does not contain a receipt with the same
+    /// transaction hash.
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub unsafe fn insert_receipt_unchecked(&mut self, receipt: BlockReceipt) -> &Arc<BlockReceipt> {
         let receipt = Arc::new(receipt);
@@ -190,8 +195,8 @@ impl<BlockT: Block + Clone + ?Sized> SparseBlockchainStorage<BlockT> {
     ///
     /// # Safety
     ///
-    /// Ensure that the instance does not contain a receipt with the same transaction hash
-    /// as any of the inputs.
+    /// Ensure that the instance does not contain a receipt with the same
+    /// transaction hash as any of the inputs.
     #[cfg_attr(feature = "tracing", tracing::instrument(skip_all))]
     pub unsafe fn insert_receipts_unchecked(
         &mut self,

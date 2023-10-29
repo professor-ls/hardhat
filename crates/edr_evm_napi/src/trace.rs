@@ -36,8 +36,8 @@ pub struct TracingMessage {
     #[napi(readonly)]
     pub value: BigInt,
 
-    /// Address of the code that is being executed. Can be different from `to` if a delegate call
-    /// is being done.
+    /// Address of the code that is being executed. Can be different from `to`
+    /// if a delegate call is being done.
     #[napi(readonly)]
     pub code_address: Option<Buffer>,
 

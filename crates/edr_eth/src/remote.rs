@@ -32,8 +32,8 @@ pub enum Eip1898BlockSpec {
     Hash {
         /// the block hash
         block_hash: B256,
-        /// whether the server should additionally raise a JSON-RPC error if the block is not in
-        /// the canonical chain
+        /// whether the server should additionally raise a JSON-RPC error if the
+        /// block is not in the canonical chain
         require_canonical: Option<bool>,
     },
     /// to represent the Object { blockNumber } in EIP-1898

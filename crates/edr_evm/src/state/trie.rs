@@ -30,7 +30,8 @@ impl TrieState {
         }
     }
 
-    /// Inserts the provided bytecode using its hash, potentially overwriting an existing value.
+    /// Inserts the provided bytecode using its hash, potentially overwriting an
+    /// existing value.
     pub fn insert_code(&mut self, code_hash: B256, code: Bytecode) {
         debug_assert_eq!(code_hash, code.hash_slow());
 

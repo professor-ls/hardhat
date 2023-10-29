@@ -113,7 +113,8 @@ impl EdrStates {
         }
     }
 
-    /// Returns a set of factories, each member of which produces a clone of one of the state objects in this struct.
+    /// Returns a set of factories, each member of which produces a clone of one
+    /// of the state objects in this struct.
     #[allow(dead_code)]
     fn make_state_refs(&self) -> Vec<TestState<'_>> {
         vec![

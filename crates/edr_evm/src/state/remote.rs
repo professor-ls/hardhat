@@ -2,20 +2,18 @@ mod cached;
 
 use std::sync::Arc;
 
+pub use cached::CachedRemoteState;
+use edr_eth::{
+    remote::{BlockSpec, RpcClient, RpcClientError},
+    Address, B256, U256,
+};
 use revm::{
     db::StateRef,
     primitives::{AccountInfo, Bytecode},
 };
 use tokio::runtime;
 
-use edr_eth::{
-    remote::{BlockSpec, RpcClient, RpcClientError},
-    Address, B256, U256,
-};
-
 use super::StateError;
-
-pub use cached::CachedRemoteState;
 
 /// A state backed by a remote Ethereum node
 #[derive(Debug)]

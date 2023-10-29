@@ -352,9 +352,8 @@ where
 mod tests {
     use revm_primitives::{Address, Bytes};
 
-    use crate::log::Log;
-
     use super::*;
+    use crate::log::Log;
 
     fn dummy_receipts() -> Vec<TypedReceipt<Log>> {
         [

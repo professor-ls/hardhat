@@ -3,8 +3,6 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use indexmap::IndexMap;
-
 use edr_eth::{
     remote::{BlockSpec, BlockTag, Eip1898BlockSpec, RpcClient},
     signature::public_key_to_address,
@@ -17,6 +15,7 @@ use edr_evm::{
     AccountInfo, Block, CfgEnv, HashMap, HashSet, MemPool, MineBlockResult, MineOrdering,
     RandomHashGenerator, SyncBlock, KECCAK_EMPTY,
 };
+use indexmap::IndexMap;
 
 use crate::{filter::Filter, node::node_error::NodeError, AccountConfig, Config};
 
@@ -372,9 +371,8 @@ mod tests {
     use anyhow::Result;
     use tempfile::TempDir;
 
-    use crate::config::test_tools::create_test_config;
-
     use super::*;
+    use crate::config::test_tools::create_test_config;
 
     struct NodeDataTestFixture {
         // We need to keep the tempdir alive for the duration of the test

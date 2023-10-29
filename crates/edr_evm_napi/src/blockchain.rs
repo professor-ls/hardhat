@@ -1,18 +1,17 @@
 use std::{fmt::Debug, ops::Deref, path::PathBuf, sync::Arc};
 
-use napi::{
-    bindgen_prelude::{BigInt, Buffer, ObjectFinalize},
-    tokio::{runtime, sync::RwLock},
-    Env, JsObject, Status,
-};
-use napi_derive::napi;
-
 use edr_eth::{remote::RpcClient, spec::HardforkActivations, B256};
 use edr_evm::{
     blockchain::{BlockchainError, SyncBlockchain},
     state::{AccountTrie, StateError, TrieState},
     HashMap,
 };
+use napi::{
+    bindgen_prelude::{BigInt, Buffer, ObjectFinalize},
+    tokio::{runtime, sync::RwLock},
+    Env, JsObject, Status,
+};
+use napi_derive::napi;
 
 use crate::{
     account::{genesis_accounts, GenesisAccount},

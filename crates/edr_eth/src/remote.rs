@@ -20,9 +20,9 @@ pub mod methods;
 
 mod cacheable_method_invocation;
 
-use crate::B256;
-
 pub use client::{RpcClient, RpcClientError};
+
+use crate::B256;
 
 /// for representing block specifications per EIP-1898
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]

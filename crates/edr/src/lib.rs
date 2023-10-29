@@ -7,9 +7,8 @@ use std::{
 
 use anyhow::anyhow;
 use clap::{Args, Parser, Subcommand};
-use tracing::{event, Level};
-
 use edr_eth::Address;
+use tracing::{event, Level};
 
 pub mod config;
 

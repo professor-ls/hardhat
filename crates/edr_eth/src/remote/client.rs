@@ -20,6 +20,11 @@ use sha3::{digest::FixedOutput, Digest, Sha3_256};
 use tokio::sync::{OnceCell, RwLock};
 use uuid::Uuid;
 
+use super::{
+    eth, jsonrpc,
+    methods::{GetLogsInput, MethodInvocation},
+    BlockSpec,
+};
 use crate::{
     block::{block_time, is_safe_block_number, IsSafeBlockNumberArgs},
     log::FilterLog,
@@ -32,12 +37,6 @@ use crate::{
         jsonrpc::Id,
     },
     serde::ZeroXPrefixedBytes,
-};
-
-use super::{
-    eth, jsonrpc,
-    methods::{GetLogsInput, MethodInvocation},
-    BlockSpec,
 };
 
 const RPC_CACHE_DIR: &str = "rpc_cache";
@@ -1065,16 +1064,14 @@ mod tests {
 
     #[cfg(feature = "test-remote")]
     mod alchemy {
-        use futures::future::join_all;
         use std::fs::File;
 
-        use crate::Bytes;
-
         use edr_test_utils::env::{get_alchemy_url, get_infura_url};
+        use futures::future::join_all;
+        use walkdir::WalkDir;
 
         use super::*;
-
-        use walkdir::WalkDir;
+        use crate::Bytes;
 
         // The maximum block number that Alchemy allows
         const MAX_BLOCK_NUMBER: u64 = u64::MAX >> 1;

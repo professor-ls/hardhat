@@ -1,14 +1,14 @@
-use napi::{
-    bindgen_prelude::{BigInt, Buffer},
-    Status,
-};
-use napi_derive::napi;
 use std::collections::HashMap;
 
 use edr_eth::B256;
 use edr_evm::{
     execution_result_to_debug_result, BlockEnv, CfgEnv, ResultAndState, TracerEip3155, TxEnv,
 };
+use napi::{
+    bindgen_prelude::{BigInt, Buffer},
+    Status,
+};
+use napi_derive::napi;
 
 use crate::{
     block::BlockConfig,

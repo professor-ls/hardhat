@@ -4,9 +4,8 @@ use revm::{
     primitives::{hash_map::Entry, AccountInfo, Bytecode, HashMap},
 };
 
-use crate::state::{account::EdrAccount, StateError};
-
 use super::RemoteState;
+use crate::state::{account::EdrAccount, StateError};
 
 /// A cached version of [`RemoteState`].
 #[derive(Debug)]

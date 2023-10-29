@@ -6,9 +6,8 @@ use edr_eth::{
 use parking_lot::{RwLock, RwLockUpgradableReadGuard, RwLockWriteGuard};
 use revm::primitives::HashMap;
 
-use crate::{state::StateDiff, Block, LocalBlock};
-
 use super::SparseBlockchainStorage;
+use crate::{state::StateDiff, Block, LocalBlock};
 
 /// A reservation for a sequence of blocks that have not yet been inserted into
 /// storage.

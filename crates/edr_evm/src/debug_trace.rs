@@ -1,7 +1,5 @@
-use crate::{
-    blockchain::SyncBlockchain, evm::build_evm, state::SyncState, PendingTransaction,
-    TransactionError,
-};
+use std::{collections::HashMap, fmt::Debug};
+
 use edr_eth::{signature::SignatureError, B256};
 use revm::{
     inspectors::GasInspector,
@@ -11,7 +9,11 @@ use revm::{
     },
     EVMData, Inspector, JournalEntry,
 };
-use std::{collections::HashMap, fmt::Debug};
+
+use crate::{
+    blockchain::SyncBlockchain, evm::build_evm, state::SyncState, PendingTransaction,
+    TransactionError,
+};
 
 /// Get trace output for `debug_traceTransaction`
 #[cfg_attr(feature = "tracing", tracing::instrument)]

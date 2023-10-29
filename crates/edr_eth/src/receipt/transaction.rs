@@ -84,9 +84,8 @@ where
 
 #[cfg(test)]
 mod test {
-    use crate::receipt::TypedReceiptData;
-
     use super::*;
+    use crate::receipt::TypedReceiptData;
 
     #[test]
     fn test_transaction_receipt_serde() {

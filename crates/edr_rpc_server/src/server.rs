@@ -8,9 +8,6 @@ use axum::{
     http::StatusCode,
     Router,
 };
-use sha3::{Digest, Keccak256};
-use tracing::{event, Level};
-
 use edr_eth::{
     remote::{
         client::Request as RpcRequest,
@@ -25,6 +22,8 @@ use edr_eth::{
     Address, Bytes, B256, U256, U64,
 };
 use edr_evm::{blockchain::BlockchainError, state::StateError, MineBlockResult};
+use sha3::{Digest, Keccak256};
+use tracing::{event, Level};
 
 use crate::{
     node::{Node, NodeError},

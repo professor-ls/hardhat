@@ -13,11 +13,10 @@ use revm::{
 };
 use tokio::runtime;
 
-use crate::random::RandomHashGenerator;
-
 use super::{
     remote::CachedRemoteState, AccountTrie, RemoteState, StateDebug, StateError, TrieState,
 };
+use crate::random::RandomHashGenerator;
 
 /// A database integrating the state from a remote node and the state from a
 /// local layered database.

@@ -6,11 +6,10 @@
 
 //! Ethereum account types
 
+pub use revm_primitives::KECCAK_EMPTY;
 use revm_primitives::{ruint, AccountInfo};
 
 use crate::{trie::KECCAK_NULL_RLP, B256, U256};
-
-pub use revm_primitives::KECCAK_EMPTY;
 
 /// Basic account type.
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -249,8 +249,9 @@ pub mod u8 {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use serde_json::json;
+
+    use super::*;
 
     #[derive(Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
     struct TestStructSerde {

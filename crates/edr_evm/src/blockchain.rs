@@ -12,15 +12,14 @@ use edr_eth::{
 };
 use revm::{db::BlockHashRef, primitives::SpecId, DatabaseCommit};
 
-use crate::{
-    state::{StateDiff, SyncState},
-    Block, LocalBlock, SyncBlock,
-};
-
 use self::storage::ReservableSparseBlockchainStorage;
 pub use self::{
     forked::{CreationError as ForkedCreationError, ForkedBlockchain},
     local::{CreationError as LocalCreationError, LocalBlockchain},
+};
+use crate::{
+    state::{StateDiff, SyncState},
+    Block, LocalBlock, SyncBlock,
 };
 
 /// Combinatorial error for the blockchain API.

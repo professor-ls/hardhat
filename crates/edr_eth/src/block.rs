@@ -17,13 +17,6 @@ use revm_primitives::{
 };
 use rlp::Decodable;
 
-use crate::{
-    transaction::SignedTransaction,
-    trie::{self, KECCAK_NULL_RLP},
-    withdrawal::Withdrawal,
-    Address, Bloom, Bytes, B256, B64, U256,
-};
-
 use self::difficulty::calculate_ethash_canonical_difficulty;
 pub use self::{
     options::BlockOptions,
@@ -31,6 +24,12 @@ pub use self::{
         block_time, is_safe_block_number, largest_safe_block_number, safe_block_depth,
         IsSafeBlockNumberArgs, LargestSafeBlockNumberArgs,
     },
+};
+use crate::{
+    transaction::SignedTransaction,
+    trie::{self, KECCAK_NULL_RLP},
+    withdrawal::Withdrawal,
+    Address, Bloom, Bytes, B256, B64, U256,
 };
 
 /// Ethereum block
@@ -494,9 +493,8 @@ mod tests {
 
     use revm_primitives::ruint::aliases::U64;
 
-    use crate::trie::KECCAK_RLP_EMPTY_ARRAY;
-
     use super::*;
+    use crate::trie::KECCAK_RLP_EMPTY_ARRAY;
 
     #[test]
     fn header_rlp_roundtrip() {

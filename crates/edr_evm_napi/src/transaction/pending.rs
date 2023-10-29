@@ -8,12 +8,11 @@ use napi::{
 };
 use napi_derive::napi;
 
-use crate::{cast::TryCast, config::SpecId, state::State};
-
 use super::signed::{
     Eip1559SignedTransaction, Eip2930SignedTransaction, Eip4844SignedTransaction,
     LegacySignedTransaction,
 };
+use crate::{cast::TryCast, config::SpecId, state::State};
 
 #[napi]
 pub struct PendingTransaction {

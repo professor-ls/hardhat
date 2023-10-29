@@ -3,9 +3,8 @@ use std::sync::Arc;
 use edr_eth::{receipt::BlockReceipt, B256, U256};
 use revm::primitives::HashMap;
 
-use crate::Block;
-
 use super::InsertError;
+use crate::Block;
 
 /// A storage solution for storing a subset of a Blockchain's blocks in-memory.
 #[derive(Debug)]

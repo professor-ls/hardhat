@@ -4,8 +4,6 @@ use assert_cmd::{
     assert::Assert,
     cargo::CommandCargoExt, // for process::Command::cargo_bin
 };
-use predicates::str::contains;
-
 use edr_eth::{
     remote::{
         client::Request as RpcRequest,
@@ -17,6 +15,7 @@ use edr_eth::{
     Bytes, U256, U64,
 };
 use edr_rpc_server::{HardhatMethodInvocation, MethodInvocation};
+use predicates::str::contains;
 
 #[tokio::test]
 async fn node() -> Result<(), Box<dyn std::error::Error>> {

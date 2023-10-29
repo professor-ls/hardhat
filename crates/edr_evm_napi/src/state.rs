@@ -21,6 +21,7 @@ use napi::{
     Env, JsFunction, JsObject, NapiRaw, Status,
 };
 use napi_derive::napi;
+pub use overrides::*;
 
 use crate::{
     account::{genesis_accounts, Account, GenesisAccount},
@@ -29,8 +30,6 @@ use crate::{
     sync::{await_promise, handle_error},
     threadsafe_function::{ThreadSafeCallContext, ThreadsafeFunction, ThreadsafeFunctionCallMode},
 };
-
-pub use overrides::*;
 
 // An arbitrarily large amount of memory to signal to the javascript garbage
 // collector that it needs to attempt to free the state object's memory.

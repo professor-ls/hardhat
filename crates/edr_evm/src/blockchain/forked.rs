@@ -15,14 +15,13 @@ use revm::{
 };
 use tokio::runtime;
 
-use crate::{
-    state::{ForkState, StateDiff, StateError, SyncState},
-    Block, LocalBlock, RandomHashGenerator, SyncBlock,
-};
-
 use super::{
     compute_state_at_block, remote::RemoteBlockchain, storage::ReservableSparseBlockchainStorage,
     validate_next_block, Blockchain, BlockchainError, BlockchainMut,
+};
+use crate::{
+    state::{ForkState, StateDiff, StateError, SyncState},
+    Block, LocalBlock, RandomHashGenerator, SyncBlock,
 };
 
 /// An error that occurs upon creation of a [`ForkedBlockchain`].

@@ -14,6 +14,7 @@ use napi::{
 };
 use napi_derive::napi;
 
+use super::{Block, BlockHeader, BlockOptions};
 use crate::{
     blockchain::Blockchain,
     cast::TryCast,
@@ -21,8 +22,6 @@ use crate::{
     state::State,
     transaction::{result::TransactionResult, PendingTransaction},
 };
-
-use super::{Block, BlockHeader, BlockOptions};
 
 #[napi]
 pub struct BlockBuilder {

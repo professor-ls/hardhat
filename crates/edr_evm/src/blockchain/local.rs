@@ -9,14 +9,13 @@ use async_trait::async_trait;
 use edr_eth::{block::PartialHeader, trie::KECCAK_NULL_RLP, Bytes, B256, B64, U256};
 use revm::{db::BlockHashRef, primitives::SpecId};
 
-use crate::{
-    state::{StateDebug, StateDiff, StateError, SyncState, TrieState},
-    Block, LocalBlock, SyncBlock,
-};
-
 use super::{
     compute_state_at_block, storage::ReservableSparseBlockchainStorage, validate_next_block,
     Blockchain, BlockchainError, BlockchainMut,
+};
+use crate::{
+    state::{StateDebug, StateDiff, StateError, SyncState, TrieState},
+    Block, LocalBlock, SyncBlock,
 };
 
 /// An error that occurs upon creation of a [`LocalBlockchain`].

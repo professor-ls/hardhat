@@ -132,9 +132,9 @@ impl TryFrom<AccountConfig> for ServerAccountConfig {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     use toml;
+
+    use super::*;
 
     #[test]
     fn test_config_file_serde() {

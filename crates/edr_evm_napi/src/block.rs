@@ -2,6 +2,7 @@ mod builder;
 
 use std::{mem, ops::Deref, sync::Arc};
 
+pub use builder::BlockBuilder;
 use edr_eth::{Address, Bloom, Bytes, B256, B64};
 use edr_evm::{blockchain::BlockchainError, BlobExcessGasAndPrice, BlockEnv, SyncBlock};
 use napi::{
@@ -18,8 +19,6 @@ use crate::{
         LegacySignedTransaction,
     },
 };
-
-pub use builder::BlockBuilder;
 
 #[napi(object)]
 pub struct BlockConfig {

@@ -20,14 +20,13 @@ use revm::{
     },
 };
 
+use super::local::LocalBlock;
 use crate::{
     blockchain::SyncBlockchain,
     evm::{build_evm, run_transaction, SyncInspector},
     state::{AccountModifierFn, StateDiff, SyncState},
     PendingTransaction,
 };
-
-use super::local::LocalBlock;
 
 /// An error caused during construction of a block builder.
 #[derive(Debug, thiserror::Error)]

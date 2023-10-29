@@ -1,8 +1,8 @@
-use crate::block::{is_safe_block_number, IsSafeBlockNumberArgs};
 use revm_primitives::{Address, B256};
 use sha3::{digest::FixedOutput, Digest, Sha3_256};
 
 use crate::{
+    block::{is_safe_block_number, IsSafeBlockNumberArgs},
     remote::{
         methods::{GetLogsInput, MethodInvocation},
         BlockSpec, BlockTag, Eip1898BlockSpec,

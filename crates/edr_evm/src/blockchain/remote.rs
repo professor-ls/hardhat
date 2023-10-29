@@ -7,9 +7,8 @@ use edr_eth::{
     B256, U256,
 };
 
-use crate::{Block, RemoteBlock};
-
 use super::storage::SparseBlockchainStorage;
+use crate::{Block, RemoteBlock};
 
 #[derive(Debug)]
 pub struct RemoteBlockchain<BlockT: Block + Clone, const FORCE_CACHING: bool> {

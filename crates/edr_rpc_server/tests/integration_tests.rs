@@ -1,8 +1,5 @@
 use std::{net::SocketAddr, str::FromStr};
 
-use tempfile::TempDir;
-use tracing::Level;
-
 use edr_eth::{
     remote::{
         client::Request as RpcRequest,
@@ -16,8 +13,9 @@ use edr_eth::{
     Address, Bytes, B256, U256, U64,
 };
 use edr_evm::KECCAK_EMPTY;
-
 use edr_rpc_server::{create_test_config, HardhatMethodInvocation, MethodInvocation, Server};
+use tempfile::TempDir;
+use tracing::Level;
 
 const SECRET_KEY: &str = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80";
 

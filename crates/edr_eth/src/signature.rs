@@ -371,8 +371,9 @@ impl From<B256> for RecoveryMessage {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::str::FromStr;
+
+    use super::*;
 
     #[test]
     fn recover_web3_signature() {

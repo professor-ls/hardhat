@@ -1,4 +1,4 @@
----
+kaha---
 title: Getting started with Hardhat
 description: Getting started with Hardhat, a development environment to compile, deploy, test, and debug your Ethereum software
 ---
